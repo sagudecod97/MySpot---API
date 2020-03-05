@@ -36,7 +36,7 @@ const getUser = async (req, res) => {
         .exec()
 
         if (!user) {
-            res.status(400).json({'Error': 'User doesn\'t exists'})
+            res.status(400).json({'Error': 'User doesn\'t exist'})
         }
 
         res.status(200).json(user)
@@ -65,7 +65,7 @@ const updateUser = async (req, res) => {
         res.status(200).json({ data: updateUser})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'The user id doesn\'t exists'})
+        res.status(400).json({'Error': 'The user id doesn\'t exist'})
     }
 }
 
