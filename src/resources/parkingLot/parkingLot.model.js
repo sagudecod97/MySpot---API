@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const parkingLotSchema = mongoose.Schema({
+const parkingLotSchema = new mongoose.Schema({
     parkingName: {
         type: String,
         required: true
