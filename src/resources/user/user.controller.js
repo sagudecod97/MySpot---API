@@ -12,7 +12,21 @@ export const createUser = async (req, res) => {
     }
 }
 
-export const getUser = async(req, res) => {
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User
+        .find({})
+        .lean()
+        .exec()
+
+        res.status(200).json({data: users})
+    } catch (err) {
+        console.error(err)
+        res.status(400).json({'Error': 'Getting the users'})
+    }
+}
+
+export const getUser = async (req, res) => {
     try {
         const user = await User
         .findOne({ _id: req.params.id})
