@@ -1,18 +1,20 @@
 const User = require('./user.model')
 
-export const createUser = async (req, res) => {
+const createUser = async (req, res) => {
     try {
         const user = await User
-        .create(req.body)
+        .create({...req.body})
+        
+        console.log(user)
 
         res.status(201).json(user)
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'Creating user'})
+        res.status(400).json({'Error': 'The data to create is wrong!'})
     }
 }
 
-export const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const users = await User
         .find({})
@@ -26,12 +28,16 @@ export const getAllUsers = async (req, res) => {
     }
 }
 
-export const getUser = async (req, res) => {
+const getUser = async (req, res) => {
     try {
         const user = await User
         .findOne({ _id: req.params.id})
         .lean()
         .exec()
+
+        if (!user) {
+            res.status(400).json({'Error': 'User doesn\'t exists'})
+        }
 
         res.status(200).json(user)
 
@@ -41,12 +47,13 @@ export const getUser = async (req, res) => {
     }
 }
 
-export const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
     try {
         const updateUser = await User
-        .updateOne({
-            _id: req.body.id
-        },
+        .findByIdAndUpdate(
+            req.params.id,
+            req.body
+        ,
         { new: true})
         .lean()
         .exec()
@@ -58,11 +65,11 @@ export const updateUser = (req, res) => {
         res.status(200).json({ data: updateUser})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'Updating user'})
+        res.status(400).json({'Error': 'The user id doesn\'t exists'})
     }
 }
 
-export const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
     try {
         const deletedUser = await User
         .deleteOne({ _id: req.params.id})
@@ -79,3 +86,5 @@ export const deleteUser = (req, res) => {
         res.status(400).json({'Error': 'While deleting the user'})
     }
 }
+
+module.exports = { createUser, getAllUsers, getUser, updateUser, deleteUser }
