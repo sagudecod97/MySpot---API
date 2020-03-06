@@ -34,6 +34,7 @@ const getUserVehicles = async (req, res) => {
     try {
         const userVehicles = await UserVehicle
         .find({ owner: req.params.id})
+        .populate('owner')
 
         res.status(200).json({data: userVehicles})
     } catch (err) {
@@ -53,14 +54,14 @@ const updateUserVehicle = async (req, res) => {
         .lean()
         .exec()
          
-        if (!updateUserVehicle) {
-            res.status(400).json({'Error': 'Couldn\'t update the vehicle'})
+        if (!updatedVehicle || updatedVehicle === null) {
+            res.status(400).json({'Error': 'The vehicle id doesn\'t not exist'})
         }
 
         res.status(200).json({data: updatedVehicle})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'The vehicle id doesn\'t not exist'})
+        res.status(400).json({'Error': 'Couldn\'t update the vehicle'})
     }
 }
 
