@@ -9,6 +9,7 @@ const connectDB = require('./utils/db')
 const userRouter = require('./src/resources/user/user.router')
 const parkingLotRouter = require('./src/resources/parkingLot/parkingLot.router')
 const userVehicleRouter = require('./src/resources/userVehicle/userVehicle.router')
+const bookingRouter = require('./src/resources/booking/booking.router')
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.use(morgan('dev'))
 app.use('/api/v1/users/', userRouter)
 app.use('/api/v1/parking-lots/', parkingLotRouter)
 app.use('/api/v1/user-vehicles/', userVehicleRouter)
+app.use('/api/v1/bookings/', bookingRouter)
 
 /** Connection **/
 const start = async () => {
@@ -34,4 +36,5 @@ const start = async () => {
         console.error('Error Connecting Server:', err)
     }
 }
+
 module.exports = {start, app}
