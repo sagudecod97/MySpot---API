@@ -7,6 +7,7 @@ const config = require('./config/serverConfig')
 const connectDB = require('./utils/db')
 
 const userRouter = require('./src/resources/user/user.router')
+const parkingLotRouter = require('./src/resources/parkingLot/parkingLot.router')
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.use(morgan('dev'))
 
 /** Routes **/
 app.use('/api/v1/users/', userRouter)
+app.use('/api/v1/parking-lots/', parkingLotRouter)
 
 /** Connection **/
 const start = async () => {

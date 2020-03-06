@@ -4,8 +4,6 @@ const createParkingLot = async (req, res) => {
     try {
         const parkingLot = await ParkingLot
         .create({...req.body})
-        .lean()
-        .exec()
 
         res.status(200).json({data: parkingLot})
 
