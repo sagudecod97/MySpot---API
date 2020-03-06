@@ -21,7 +21,7 @@ app.use(morgan('dev'))
 /** Routes **/
 app.use('/api/v1/users/', userRouter)
 app.use('/api/v1/parking-lots/', parkingLotRouter)
-app.use('/api/v1/user-vehicles/')
+app.use('/api/v1/user-vehicles/', userVehicleRouter)
 
 /** Connection **/
 const start = async () => {
