@@ -14,7 +14,7 @@ router
 
 router
     .get('/:vehicle_id', getUserVehicle)
-    .get('/:id', getUserVehicles)
+    .get('/user/:id', getUserVehicles)
     .put('/:vehicle_id', updateUserVehicle)
     .delete('/:vehicle_id', deleteUserVehicle)
 
