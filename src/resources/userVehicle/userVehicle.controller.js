@@ -15,7 +15,7 @@ const createUserVehicle = async (req, res) => {
 const getUserVehicle = async (req, res) => {
     try {
         const userVehicle = await UserVehicle
-        .findOne({_id: req.params.id})
+        .findOne({_id: req.params.vehicle_id})
         .lean()
         .exec()
 
