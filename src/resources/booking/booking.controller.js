@@ -16,6 +16,7 @@ const getBooking = async (req, res) => {
     try {
         const booking = await Booking
         .findById(req.params.id)
+        .populate(['userVehicleId', 'parkingLotId'])
         .lean()
         .exec()
 
@@ -33,11 +34,17 @@ const getBooking = async (req, res) => {
 const getAllUserBookings = async (req, res) => {
     try {
         const userBookings = await Booking
-        .find({ owner: req.params.user_id})
+        .find({ userId: req.params.user_id})
+        .populate(['userVehicleId', 'parkingLotId'])
         .lean()
         .exec()
 
-        res.status(200).json({data: userBookings})
+        if (userBookings.length === 0) {
+            res.status(400).json({'Error': 'User id doesn\'t exist or user hasn\'t got any bookings'})
+        } else {
+            res.status(200).json({data: userBookings})
+        }
+
     } catch(err) {
         console.error(err)
         res.status(400).json({'Error': 'Getting the bookings'})

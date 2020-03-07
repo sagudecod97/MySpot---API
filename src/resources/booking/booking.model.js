@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const bookingSchema = mongoose.Schema({
+    userId: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'user',
+        required: true
+    },
     userVehicleId: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'userVehicle',
