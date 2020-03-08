@@ -11,19 +11,32 @@ const parkingLotRouter = require('./src/resources/parkingLot/parkingLot.router')
 const userVehicleRouter = require('./src/resources/userVehicle/userVehicle.router')
 const bookingRouter = require('./src/resources/booking/booking.router')
 
+const { singUpUser, LoginUser, protectUserRoute } = require('./utils/auth')
+
 const app = express()
 
-/** Middleware **/
+/** Middlewares **/
 app.use(cors())
 app.use(json())
 app.use(urlencoded({ extended: true}))
 app.use(morgan('dev'))
 
+app.use('/api/user-signup', singUpUser)
+app.use('/api/login', LoginUser)
+app.use('/api/v1/users/', protectUserRoute)
+
 /** Routes **/
+
+// Main map route
+app.get('/main/', require('./src/resources/parkingLot/parkingLot.controller').getAllParkingLots)
+
+// User routes
 app.use('/api/v1/users/', userRouter)
-app.use('/api/v1/parking-lots/', parkingLotRouter)
-app.use('/api/v1/user-vehicles/', userVehicleRouter)
-app.use('/api/v1/bookings/', bookingRouter)
+app.use('/api/v1/users/user-vehicles/', userVehicleRouter)
+app.use('/api/v1/users/bookings/', bookingRouter) 
+
+// Admn Parking lot routes
+app.use('/api/v1/admin/parking-lots/', parkingLotRouter)
 
 /** Connection **/
 const start = async () => {
