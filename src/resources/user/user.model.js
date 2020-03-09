@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         maxLength: 10,
         minLength: 10
     },
-    mail: {
+    email: {
         required: true,
         type: String,
         unique: true
@@ -60,5 +60,5 @@ userSchema.methods.checkPassword = function(password) {
         })
     })
 }
- 
-module.exports = mongoose.model('user', userSchema)
+
+module.exports = mongoose.model('users', userSchema)

@@ -1,5 +1,6 @@
 const User = require('../src/resources/user/user.model')
 const JWT = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 // Secrets
 const USR_JWT_SCRT = process.env.USR_JWT_SCRT
@@ -17,7 +18,7 @@ const newTokenUser = (user) => {
 }
 
 const verifyUserToken = (token) => {
-    new Promise((res, rej) => {
+    new Promise((resolve, reject) => {
         JWT.verify(token, USR_JWT_SCRT, (err, payload) => {
             if (err) {
                 return reject(err)
@@ -51,13 +52,21 @@ const singUpUser = async (req, res) => {
     try {
         const user = await User
         .create({...req.body})
+        console.log(user)
 
         const newUserToken = newTokenUser(user)
-        res.status(201).send({ newUserToken }).json({data: user})
+        res.status(201).send({ newUserToken })
     } catch(err) {
         console.error(err)
-        res.status(400).json({'Error': 'Signin up the user'})
-    }
+        if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.userName) {
+            res.status(400).json({'Error': 'Username already in use'})
+        } else if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
+            res.status(400).json({'Error': 'Email already in use'})
+        } else {
+            res.status(400).json({'Error': 'All fields are required'})
+        }
+        
+    } 
 }
 
 const LoginUser = async (req, res) => {
@@ -68,7 +77,7 @@ const LoginUser = async (req, res) => {
 
     try {
         const user = await User
-        .findById(req.params.id)
+        .findOne({ userName: userLog.userName})
         .lean()
         .exec()
 
@@ -76,14 +85,17 @@ const LoginUser = async (req, res) => {
             res.status(400).json({'Error': 'User id doesn\'t not exist'})
         }
 
-        const passwordMatch = await user.checkPassword(userLog.password)
-
-        if (!passwordMatch) {
-            res.status(401).json({'Error': 'Invalid password or user-name'})
-        }
-
-        const newUserToken = newTokenUser(user)
-        res.status(200).send({ newUserToken }).json({data: user})
+        await bcrypt.compare(userLog.password, user.password, (err, same) => {
+            if (err) {
+                throw err
+            } else if (!same) {
+                res.status(401).json({'Error': 'Invalid password or user-name'})
+            } else {
+                const newUserToken = newTokenUser(user)
+                res.status(200).send({ newUserToken })
+            }
+        })
+       
     } catch(err) {
         console.error(err)
         res.status(500).json({'Error': 'Login the user'})
@@ -92,21 +104,30 @@ const LoginUser = async (req, res) => {
 
 const protectUserRoute = async (req, res, next) => {
     const bearer = req.headers.authorization
+
+    if (!bearer) {
+        res.status(401).json({'Error': 'Not authenticated'})
+    }
     const bearerArray = bearer.split(' ')
     const tokenUser = bearerArray[1].trim()
 
-    if (!bearer || bearerArray[0] !== 'Bearer') {
+    if (bearerArray[0] !== 'Bearer') {
         res.status(401).json({'Error': 'Not authenticated'})
     }
 
     let payload
     try {
-        payload = await verifyUserToken(tokenUser)
+        await JWT.verify(tokenUser, USR_JWT_SCRT, (err, decoded) => {
+            if (err) {
+                throw err
+            }
+            payload = decoded
+        }) 
     } catch(err) {
         console.error(err)
         res.status(401).json({'Error': 'Not authenticated'})
     }
-
+    
     const user = await User
     .findById(payload.id)
     .lean()
@@ -116,7 +137,7 @@ const protectUserRoute = async (req, res, next) => {
         res.status(401).json({'Error': 'Not authenticated'})
     }
 
-    next()
+    return next()
 }
 
 module.exports = {

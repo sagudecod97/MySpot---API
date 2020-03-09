@@ -21,8 +21,8 @@ app.use(json())
 app.use(urlencoded({ extended: true}))
 app.use(morgan('dev'))
 
-app.use('/api/user-signup', singUpUser)
-app.use('/api/login', LoginUser)
+app.use('/api/v1/user-signup', singUpUser)
+app.use('/api/v1/login/', LoginUser)
 app.use('/api/v1/users/', protectUserRoute)
 
 /** Routes **/
