@@ -7,11 +7,14 @@ const config = require('./config/serverConfig')
 const connectDB = require('./utils/db')
 
 const userRouter = require('./src/resources/user/user.router')
+const adminRouter = require('./src/resources/admin/admin.router')
 const parkingLotRouter = require('./src/resources/parkingLot/parkingLot.router')
 const userVehicleRouter = require('./src/resources/userVehicle/userVehicle.router')
 const bookingRouter = require('./src/resources/booking/booking.router')
 
 const { singUpUser, LoginUser, protectUserRoute } = require('./utils/auth')
+const { signUpAdmin,  LoginAdmin, protectAdminRoute } = require('./utils/auth')
+
 
 const app = express()
 
@@ -21,8 +24,12 @@ app.use(json())
 app.use(urlencoded({ extended: true}))
 app.use(morgan('dev'))
 
+app.use('/api/v1/admin-signup', signUpAdmin)
+app.use('/api/v1/admin-login/', LoginAdmin)
+app.use('/api/v1/admin/', protectAdminRoute)
+
 app.use('/api/v1/user-signup', singUpUser)
-app.use('/api/v1/login/', LoginUser)
+app.use('/api/v1/user-login/', LoginUser)
 app.use('/api/v1/users/', protectUserRoute)
 
 /** Routes **/
@@ -37,6 +44,7 @@ app.use('/api/v1/users/bookings/', bookingRouter)
 
 // Admn Parking lot routes
 app.use('/api/v1/admin/parking-lots/', parkingLotRouter)
+app.use('/api/v1/admin/', adminRouter)
 
 /** Connection **/
 const start = async () => {

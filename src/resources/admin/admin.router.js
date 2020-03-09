@@ -7,7 +7,7 @@ const {
 const router = Router()
 
 router
-    .post('/:id', getAdmin)
+    .get('/:id', getAdmin)
     .put('/:id', updateAdmin)
 
 module.exports = router
