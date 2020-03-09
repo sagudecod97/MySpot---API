@@ -39,7 +39,7 @@ const getUser = async (req, res) => {
             res.status(400).json({'Error': 'User doesn\'t exist'})
         }
 
-        res.status(200).json(user)
+        res.status(200).json({ data: user})
 
     } catch (err) {
         console.error(err)
