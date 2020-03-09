@@ -1,4 +1,5 @@
 const User = require('../src/resources/user/user.model')
+const Admin = require('../src/resources/admin-parking/admin.model')
 const JWT = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -140,6 +141,94 @@ const protectUserRoute = async (req, res, next) => {
     return next()
 }
 
+// SignUp && Login -- Admin ParkingLot
+const SignUpAdmin = async (req, res) => {
+    try {
+        const admin = await Admin
+        .create({...req.body})
+
+        const newAdminToken = newAdminToken(admin)
+        res.status(201).send({ newAdminToken })
+    } catch (err) {
+        console.error(err)
+        if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
+            res.status(400).json({'Error': 'Email already in use'})
+        } else {
+            res.status(400).json({'Error': 'All fields are required'})
+        }
+    }
+}
+
+const LoginAdmin = async (req, res) => {
+    const adminLog = req.body
+    if (!adminLog.email || !adminLog.password) {
+        res.status(400).json({'Error': 'Need email and password'})
+    }
+
+    try {
+        const admin = await Admin
+        .findOne({ email: adminLog.email })
+        .lean()
+        .exec()
+
+        if (!admin) {
+            res.status(400).json({'Error': 'Admin doesn\'t exist'})
+        }
+
+        await bcrypt.compare(adminLog.password, admin.password, (err, same) => {
+            if (err) {
+                throw err
+            } else if (!same) {
+                res.status(401).json({'Error': 'Incorrect password' })
+            } else {
+                const newAdminToken = newAdminToken(admin)
+                res.status(200).send({ newAdminToken })
+            }
+        })
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({'Error': 'Loggin the Admin'})
+    }
+}
+
+const protectAdminRoute = async (req, res) => {
+    const bearer = req.headers.authorization
+
+    if (!bearer) {
+        res.status(401).json({'Error': 'Not authenticated'})
+    }
+    const bearerArray = bearer.split(' ')
+    const tokenAdmin = bearerArray[1].trim()
+
+    if (bearerArray[0] !== 'Bearer') {
+        res.status(401).json({'Error': 'Not authenticated'})
+    }
+
+    let payload
+    try {
+        await JWT.verify(tokenAdmin, ADM_JWT_SCRT, (err, decoded)=> {
+            if (err) {
+                throw err
+            } else {
+                payload = decoded
+            }
+        })
+    } catch(err) {
+        console.error(err)
+        res.status(401).json({'Error': 'Not authenticated'})
+    }
+
+    const admin = await Admin
+    .findById(payload.id)
+    .lean()
+    .exec()
+
+    if (!admin) {
+        res.status(401).json({'Error': 'Not authenticated'})
+    }
+    return next()
+}
+
 module.exports = {
     newTokenUser,
     verifyUserToken,
@@ -148,4 +237,7 @@ module.exports = {
     protectUserRoute,
     newAdminToken,
     verifyAdminToken,
+    SignUpAdmin,
+    LoginAdmin,
+    protectAdminRoute
 }
