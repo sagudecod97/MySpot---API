@@ -3,7 +3,7 @@ const Admin = require('./admin.model')
 const getAdmin = async (req, res) => {
     try {
         const admin = await Admin
-        .findOne({ email: req.params.body})
+        .findOne({ _id: req.params.id})
         .lean()
         .exec()
 
