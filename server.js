@@ -28,7 +28,7 @@ app.use('/api/v1/users/', protectUserRoute)
 /** Routes **/
 
 // Main map route
-app.get('/main/', require('./src/resources/parkingLot/parkingLot.controller').getAllParkingLots)
+app.get('/api/v1/main/', require('./src/resources/parkingLot/parkingLot.controller').getAllParkingLots)
 
 // User routes
 app.use('/api/v1/users/', userRouter)
