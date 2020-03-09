@@ -12,7 +12,6 @@ const baseConfig = {
     isProduction: ENV === 'prod' || ENV === 'production',
     PORT: ENV === 'prod' || ENV === 'production' ? 5000 : 3000,
     secrets: {
-        jwt: process.env.JWT_SECRET,
         jwtExp: '100d'
     }
 }
