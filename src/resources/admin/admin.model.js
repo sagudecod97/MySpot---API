@@ -22,6 +22,10 @@ const adminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    parkingLot: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'parkingLot'
     }
 }, { timestamps: true})
 

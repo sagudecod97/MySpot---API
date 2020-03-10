@@ -3,15 +3,17 @@ const mongoose = require('mongoose')
 const userVehicleSchema = mongoose.Schema({
     vehicleLicense: {
         required: true,
-        type: String
+        type: String,
+        required: true
     },
     isACar: {
         required: true,
-        type: Boolean
+        type: Boolean,
+        required: true
     },
     owner: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'user',
+        ref: 'users',
         required: true
     }
 }, { timestamps: true})
