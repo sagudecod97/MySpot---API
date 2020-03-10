@@ -1,7 +1,46 @@
 const Booking = require('./booking.model')
+const ParkingLot = require('../parkingLot/parkingLot.model')
+const UserVehicle = require('../userVehicle/userVehicle.model')
 
 const createBooking = async (req, res) => {
     try {
+        const userVehicle = await UserVehicle
+        .findById(req.body.userVehicleId)
+        .exec()
+
+        if (!userVehicle) {
+            res.status(400).json({'Error': 'Vehicle id doesn\'t exist'})
+        }
+        const parkingLot = await ParkingLot
+        .findById(req.body.parkingLotId)
+        .exec()
+
+        if (!parkingLot) {
+            res.status(400).json({'Error': 'Parking Lot doesn\'t exist'})
+        }
+
+        if (userVehicle.isACar == true && parkingLot.freeCarCells !== 0) {
+            await ParkingLot
+            .findByIdAndUpdate(
+                req.body.parkingLotId,
+                { 'freeCarCells': parkingLot.freeCarCells - 1},
+                { new: true})
+            .exec()
+        } else if (userVehicle.isACar == true) {
+            res.status(400).json({'Error': 'There\'s not space available for cars'})
+        }
+
+        if (userVehicle.isACar == false && parkingLot.freeBikeCells !== 0) {
+            await ParkingLot
+            .findByIdAndUpdate(
+                req.body.parkingLotId,
+                { 'freeBikeCells': parkingLot.freeBikeCells - 1},
+                { new: true})
+            .exec()
+        } else {
+            res.status(400).json({'Error': 'There\'s not space available for bike'})
+        }
+
         const createdBooking = await Booking
         .create({...req.body})
 

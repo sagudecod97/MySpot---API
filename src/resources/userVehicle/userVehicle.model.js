@@ -7,7 +7,7 @@ const userVehicleSchema = mongoose.Schema({
         required: true
     },
     isACar: {
-        required: true,
+        default: true,
         type: Boolean,
         required: true
     },
