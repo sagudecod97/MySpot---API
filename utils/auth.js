@@ -1,5 +1,5 @@
 const User = require('../src/resources/user/user.model')
-const Admin = require('../src/resources/admin-parking/admin.model')
+const Admin = require('../src/resources/admin/admin.model')
 const JWT = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -9,7 +9,7 @@ const ADM_JWT_SCRT = process.env.ADM_JWT_SCRT
 
 // Expires
 const USER_EXPRS = process.env.USER_EXPRS
-const ADMIN_EXPRS = process.env.USER_ADM
+const ADMIN_EXPRS = process.env.ADMIN_EXPRS
 
 // Create token && Verify token -- Admin and User
 const newTokenUser = (user) => {
@@ -56,7 +56,7 @@ const singUpUser = async (req, res) => {
         console.log(user)
 
         const newUserToken = newTokenUser(user)
-        res.status(201).send({ newUserToken })
+        res.status(201).send({ newUserToken, id: user._id })
     } catch(err) {
         console.error(err)
         if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.userName) {
@@ -93,7 +93,7 @@ const LoginUser = async (req, res) => {
                 res.status(401).json({'Error': 'Invalid password or user-name'})
             } else {
                 const newUserToken = newTokenUser(user)
-                res.status(200).send({ newUserToken })
+                res.status(200).send({ newUserToken, id: user._id })
             }
         })
        
@@ -142,13 +142,13 @@ const protectUserRoute = async (req, res, next) => {
 }
 
 // SignUp && Login -- Admin ParkingLot
-const SignUpAdmin = async (req, res) => {
+const signUpAdmin = async (req, res) => {
     try {
         const admin = await Admin
         .create({...req.body})
 
-        const newAdminToken = newAdminToken(admin)
-        res.status(201).send({ newAdminToken })
+        const newAdmnToken = newAdminToken(admin)
+        res.status(201).send({ newAdmnToken, id: admin._id })
     } catch (err) {
         console.error(err)
         if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
@@ -181,8 +181,8 @@ const LoginAdmin = async (req, res) => {
             } else if (!same) {
                 res.status(401).json({'Error': 'Incorrect password' })
             } else {
-                const newAdminToken = newAdminToken(admin)
-                res.status(200).send({ newAdminToken })
+                const newAdmnToken = newAdminToken(admin)
+                res.status(200).send({ newAdmnToken, id: admin._id })
             }
         })
     } catch(err) {
@@ -191,7 +191,7 @@ const LoginAdmin = async (req, res) => {
     }
 }
 
-const protectAdminRoute = async (req, res) => {
+const protectAdminRoute = async (req, res, next) => {
     const bearer = req.headers.authorization
 
     if (!bearer) {
@@ -237,7 +237,7 @@ module.exports = {
     protectUserRoute,
     newAdminToken,
     verifyAdminToken,
-    SignUpAdmin,
+    signUpAdmin,
     LoginAdmin,
     protectAdminRoute
 }
