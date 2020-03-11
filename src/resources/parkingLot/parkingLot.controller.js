@@ -5,11 +5,11 @@ const createParkingLot = async (req, res) => {
         const parkingLot = await ParkingLot
         .create({...req.body})
 
-        res.status(200).json({data: parkingLot})
+        return res.status(200).json({data: parkingLot})
 
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'the data to create parking lot is wrong'})
+        return res.status(400).json({'Error': 'the data to create parking lot is wrong'})
     }
 }
 
@@ -21,13 +21,13 @@ const getParkingLot = async (req, res) => {
         .exec()
 
         if (!parkingLot) {
-            res.status(400).json({'Error': 'Parking lot doesn\'t exist'})
+            return res.status(400).json({'Error': 'Parking lot doesn\'t exist'})
         }
         
-        res.status(200).json({ data: parkingLot})
+        return res.status(200).json({ data: parkingLot})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'Couldn\'t get parking lot'})
+        return res.status(400).json({'Error': 'Couldn\'t get parking lot'})
     }
 }
 
@@ -38,10 +38,10 @@ const getAllParkingLots = async (req, res) => {
         .lean()
         .exec()
 
-        res.status(200).json({ data: parkingLots})
+        return res.status(200).json({ data: parkingLots})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'Getting the parking lots'})
+        return res.status(400).json({'Error': 'Getting the parking lots'})
     }
 }
 
@@ -56,13 +56,13 @@ const updateParkingLot = async (req, res) => {
         .exec()
 
         if (!updatedParkingLot) {
-            res.status(400).json({ 'Error': 'Updating the parking lot'})
+            return res.status(400).json({ 'Error': 'Updating the parking lot'})
         }
 
-        res.status(200).json({ data: updatedParkingLot})
+        return res.status(200).json({ data: updatedParkingLot})
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'The parking lot id doesn\'t not exist'})
+        return res.status(400).json({'Error': 'The parking lot id doesn\'t not exist'})
     }
 }
 
@@ -73,15 +73,21 @@ const deleteParkingLot = async (req, res) => {
         .exec()
 
         if (!deletedParkingLot) {
-            res.status(400).json({'Error': 'Parking lot id doesn\'t exist'})
+            return res.status(400).json({'Error': 'Parking lot id doesn\'t exist'})
         }
 
-        res.status(200).json({delete: deletedParkingLot})
+        return res.status(200).json({delete: deletedParkingLot})
 
     } catch (err) {
         console.error(err)
-        res.status(400).json({'Error': 'Deleting the parking lot'})
+        return res.status(400).json({'Error': 'Deleting the parking lot'})
     }
 }
 
-module.exports = { createParkingLot, getParkingLot, getAllParkingLots, updateParkingLot, deleteParkingLot}
+module.exports = { 
+    createParkingLot, 
+    getParkingLot, 
+    getAllParkingLots, 
+    updateParkingLot, 
+    deleteParkingLot
+}
