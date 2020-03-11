@@ -56,15 +56,15 @@ const singUpUser = async (req, res) => {
         console.log(user)
 
         const newUserToken = newTokenUser(user)
-        res.status(201).send({ newUserToken, id: user._id })
+        return res.status(201).send({ newUserToken, id: user._id })
     } catch(err) {
         console.error(err)
         if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.userName) {
-            res.status(400).json({'Error': 'Username already in use'})
+            return res.status(400).json({'Error': 'Username already in use'})
         } else if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
-            res.status(400).json({'Error': 'Email already in use'})
+            return res.status(400).json({'Error': 'Email already in use'})
         } else {
-            res.status(400).json({'Error': 'All fields are required'})
+            return res.status(400).json({'Error': 'All fields are required'})
         }
         
     } 
@@ -99,7 +99,7 @@ const LoginUser = async (req, res) => {
        
     } catch(err) {
         console.error(err)
-        res.status(500).json({'Error': 'Login the user'})
+        return res.status(500).json({'Error': 'Login the user'})
     }
 }
 
@@ -107,13 +107,20 @@ const protectUserRoute = async (req, res, next) => {
     const bearer = req.headers.authorization
 
     if (!bearer) {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
-    const bearerArray = bearer.split(' ')
-    const tokenUser = bearerArray[1].trim()
+    let bearerArray
+    let tokenUser
+
+    try {
+        bearerArray = bearer.split(' ')
+        tokenUser = bearerArray[1].trim()
+    } catch(err) {
+        return res.status(401).json({'Error': 'Not authenticated'})
+    }
 
     if (bearerArray[0] !== 'Bearer') {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
 
     let payload
@@ -126,7 +133,7 @@ const protectUserRoute = async (req, res, next) => {
         }) 
     } catch(err) {
         console.error(err)
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
     
     const user = await User
@@ -135,7 +142,7 @@ const protectUserRoute = async (req, res, next) => {
     .exec()
 
     if (!user) {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
 
     return next()
