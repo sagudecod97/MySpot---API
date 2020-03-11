@@ -148,13 +148,13 @@ const signUpAdmin = async (req, res) => {
         .create({...req.body})
 
         const newAdmnToken = newAdminToken(admin)
-        res.status(201).send({ newAdmnToken, id: admin._id })
+        return res.status(201).send({ newAdmnToken, id: admin._id })
     } catch (err) {
         console.error(err)
         if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
-            res.status(400).json({'Error': 'Email already in use'})
+            return res.status(400).json({'Error': 'Email already in use'})
         } else {
-            res.status(400).json({'Error': 'All fields are required'})
+            return res.status(400).json({'Error': 'All fields are required'})
         }
     }
 }
@@ -162,7 +162,7 @@ const signUpAdmin = async (req, res) => {
 const LoginAdmin = async (req, res) => {
     const adminLog = req.body
     if (!adminLog.email || !adminLog.password) {
-        res.status(400).json({'Error': 'Need email and password'})
+        return res.status(400).json({'Error': 'Need email and password'})
     }
 
     try {
@@ -172,22 +172,22 @@ const LoginAdmin = async (req, res) => {
         .exec()
 
         if (!admin) {
-            res.status(400).json({'Error': 'Admin doesn\'t exist'})
+            return res.status(404).json({'Error': 'Admin doesn\'t exist'})
         }
 
         await bcrypt.compare(adminLog.password, admin.password, (err, same) => {
             if (err) {
                 throw err
             } else if (!same) {
-                res.status(401).json({'Error': 'Incorrect password' })
+                return res.status(401).json({'Error': 'Incorrect password' })
             } else {
                 const newAdmnToken = newAdminToken(admin)
-                res.status(200).send({ newAdmnToken, id: admin._id })
+                return res.status(200).send({ newAdmnToken, id: admin._id })
             }
         })
     } catch(err) {
         console.error(err)
-        res.status(500).json({'Error': 'Loggin the Admin'})
+        return res.status(500).json({'Error': 'Loggin the Admin'})
     }
 }
 
@@ -195,13 +195,13 @@ const protectAdminRoute = async (req, res, next) => {
     const bearer = req.headers.authorization
 
     if (!bearer) {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
     const bearerArray = bearer.split(' ')
     const tokenAdmin = bearerArray[1].trim()
 
     if (bearerArray[0] !== 'Bearer') {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
 
     let payload
@@ -215,7 +215,7 @@ const protectAdminRoute = async (req, res, next) => {
         })
     } catch(err) {
         console.error(err)
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
 
     const admin = await Admin
@@ -224,7 +224,7 @@ const protectAdminRoute = async (req, res, next) => {
     .exec()
 
     if (!admin) {
-        res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'})
     }
     return next()
 }
