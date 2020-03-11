@@ -73,7 +73,7 @@ const singUpUser = async (req, res) => {
 const LoginUser = async (req, res) => {
     const userLog = req.body
     if (!userLog.userName || !userLog.password) {
-        res.status(400).json({'Error': 'Need user-name and password'})
+        return res.status(400).json({'Error': 'Need user-name and password'})
     }
 
     try {
@@ -83,17 +83,17 @@ const LoginUser = async (req, res) => {
         .exec()
 
         if (!user) {
-            res.status(400).json({'Error': 'User id doesn\'t not exist'})
+            return res.status(404).json({'Error': 'User id doesn\'t not exist'})
         }
 
         await bcrypt.compare(userLog.password, user.password, (err, same) => {
             if (err) {
                 throw err
             } else if (!same) {
-                res.status(401).json({'Error': 'Invalid password or user-name'})
+                return res.status(401).json({'Error': 'Invalid password or user-name'})
             } else {
                 const newUserToken = newTokenUser(user)
-                res.status(200).send({ newUserToken, id: user._id })
+                return res.status(200).send({ newUserToken, id: user._id })
             }
         })
        
