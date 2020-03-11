@@ -113,6 +113,8 @@ const lessParkingSpotCar = async (req, res) => {
                 { new: true }
             )
             .exec()
+
+            return res.status(200).json({'OK': 200})
         }
 
     } catch(err) {
