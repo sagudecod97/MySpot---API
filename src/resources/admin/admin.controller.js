@@ -1,4 +1,5 @@
 const Admin = require('./admin.model')
+const ParkingLot = require('../parkingLot/parkingLot.model')
 
 const getAdmin = async (req, res) => {
     try {
@@ -70,9 +71,35 @@ const deleteAdmin = async (req, res) => {
     }
 }
 
+const addParkingSpotCar = async (req, res) => {
+    try {
+        const parkingLot = await ParkingLot
+        .findById(req.params.parking_id)
+        .exec()
+
+        if (parkingLot.freeCarCells + 1 > parkingLot.totalCarCells) {
+            res.status(400).json({'Error': 'All total car cells are free'})
+        } else {
+            await ParkingLot
+            .findByIdAndUpdate(
+                req.params.parking_id,
+                { 'freeCarCells': parkingLot.freeCarCells + 1},
+                { new: true}
+            )
+            .exec()
+
+            res.status(200).send({'OK': 200})
+        }
+
+    } catch(err) {
+
+    }
+}
+
 module.exports = {
     getAdmin,
     getAllAdmins,
     updateAdmin,
-    deleteAdmin
+    deleteAdmin,
+    addParkingSpotCar
 }
