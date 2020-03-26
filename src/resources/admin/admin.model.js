@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
+// Creates the admin schema with the required fields
 const adminSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -29,6 +30,7 @@ const adminSchema = new mongoose.Schema({
     }
 }, { timestamps: true})
 
+// Uses the prev event to save the password encrypted
 adminSchema.pre('save', function(next) {
     if (!this.isModified('password')) {
         return next()
@@ -44,6 +46,7 @@ adminSchema.pre('save', function(next) {
     })
 })
 
+// Adds the method the check the password of the model
 adminSchema.methods.checkPassword = function(password) {
     const passwordHashed = this.password
     return new Promise((resolve, reject) => {
