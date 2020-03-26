@@ -13,14 +13,14 @@ const ADMIN_EXPRS = process.env.ADMIN_EXPRS
 
 // Create token && Verify token -- Admin and User
 const newTokenUser = (user) => {
-    return JWT.sign({ id: user._id }, USR_JWT_SCRT, {
+    return JWT.sign({ id: user._id }, USR_JWT_SCRT, { // Creates a new token
         expiresIn: USER_EXPRS
     })
 }
 
 const verifyUserToken = (token) => {
     new Promise((resolve, reject) => {
-        JWT.verify(token, USR_JWT_SCRT, (err, payload) => {
+        JWT.verify(token, USR_JWT_SCRT, (err, payload) => { // Verifies the Token received
             if (err) {
                 return reject(err)
             } else {
@@ -31,14 +31,14 @@ const verifyUserToken = (token) => {
 }
 
 const newAdminToken = (admin) => {
-    return JWT.sign({ id: admin._id }, ADM_JWT_SCRT, {
+    return JWT.sign({ id: admin._id }, ADM_JWT_SCRT, { // Creates a new Token
         expiresIn: ADMIN_EXPRS
     })
 }
 
 const verifyAdminToken = (token) => {
     new Promise((res, rej) => {
-        JWT.verify(token, ADM_JWT_SCRT, (err, payload) => {
+        JWT.verify(token, ADM_JWT_SCRT, (err, payload) => { // Verifies the new Token
             if (err) {
                 return reject(err)
             } else {
@@ -56,15 +56,15 @@ const singUpUser = async (req, res) => {
         console.log(user)
 
         const newUserToken = newTokenUser(user)
-        return res.status(201).send({ newUserToken, id: user._id })
+        return res.status(201).send({ newUserToken, id: user._id }) // If nothing fails
     } catch(err) {
         console.error(err)
         if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.userName) {
-            return res.status(400).json({'Error': 'Username already in use'})
+            return res.status(400).json({'Error': 'Username already in use'}) // Username already exists
         } else if (typeof(err.keyPattern) !== 'undefined' && err.keyPattern.email) {
-            return res.status(400).json({'Error': 'Email already in use'})
+            return res.status(400).json({'Error': 'Email already in use'}) // Email already registered
         } else {
-            return res.status(400).json({'Error': 'All fields are required'})
+            return res.status(400).json({'Error': 'All fields are required'}) // Not the correct info received
         }
         
     } 
@@ -73,7 +73,7 @@ const singUpUser = async (req, res) => {
 const LoginUser = async (req, res) => {
     const userLog = req.body
     if (!userLog.userName || !userLog.password) {
-        return res.status(400).json({'Error': 'Need user-name and password'})
+        return res.status(400).json({'Error': 'Need user-name and password'}) // Not username or password
     }
 
     try {
@@ -83,31 +83,31 @@ const LoginUser = async (req, res) => {
         .exec()
 
         if (!user) {
-            return res.status(404).json({'Error': 'User id doesn\'t not exist'})
+            return res.status(404).json({'Error': 'User id doesn\'t not exist'}) // User doesn't exist
         }
 
-        await bcrypt.compare(userLog.password, user.password, (err, same) => {
+        await bcrypt.compare(userLog.password, user.password, (err, same) => { // Compares the password received
             if (err) {
                 throw err
             } else if (!same) {
                 return res.status(401).json({'Error': 'Invalid password or user-name'})
             } else {
                 const newUserToken = newTokenUser(user)
-                return res.status(200).send({ newUserToken, id: user._id })
+                return res.status(200).send({ newUserToken, id: user._id }) // Send a new token on success
             }
         })
        
     } catch(err) {
         console.error(err)
-        return res.status(500).json({'Error': 'Login the user'})
+        return res.status(500).json({'Error': 'Login the user'}) // Failed login the user
     }
 }
 
 const protectUserRoute = async (req, res, next) => {
-    const bearer = req.headers.authorization
+    const bearer = req.headers.authorization // Get token from the headers
 
     if (!bearer) {
-        return res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'}) // If not header, return error
     }
     let bearerArray
     let tokenUser
@@ -116,16 +116,16 @@ const protectUserRoute = async (req, res, next) => {
         bearerArray = bearer.split(' ')
         tokenUser = bearerArray[1].trim()
     } catch(err) {
-        return res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'}) // if the split or trim fail, send error
     }
 
     if (bearerArray[0] !== 'Bearer') {
-        return res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'}) // If not Bearer, send error
     }
 
     let payload
     try {
-        await JWT.verify(tokenUser, USR_JWT_SCRT, (err, decoded) => {
+        await JWT.verify(tokenUser, USR_JWT_SCRT, (err, decoded) => { // Checks the received token
             if (err) {
                 throw err
             }
@@ -133,7 +133,7 @@ const protectUserRoute = async (req, res, next) => {
         }) 
     } catch(err) {
         console.error(err)
-        return res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'}) // If authentication fails, return error
     }
     
     const user = await User
@@ -142,7 +142,7 @@ const protectUserRoute = async (req, res, next) => {
     .exec()
 
     if (!user) {
-        return res.status(401).json({'Error': 'Not authenticated'})
+        return res.status(401).json({'Error': 'Not authenticated'}) // Checks if user related to token exists
     }
 
     return next()
