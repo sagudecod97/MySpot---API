@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// Created the User vehicle schema with its required fields
 const userVehicleSchema = mongoose.Schema({
     vehicleLicense: {
         required: true,
