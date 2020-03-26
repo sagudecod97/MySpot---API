@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// Creates the booking schema with its requiered fields and relations to other schemas
 const bookingSchema = mongoose.Schema({
     userId: {
         type: mongoose.SchemaTypes.ObjectId,
