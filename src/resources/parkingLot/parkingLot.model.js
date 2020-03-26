@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// Created the Parking Lot schema with its required fields
 const parkingLotSchema = new mongoose.Schema({
     parkingName: {
         type: String,
