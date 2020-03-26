@@ -6,6 +6,7 @@ const optionsProd = require('./optionsProd')
 
 const ENV = process.env.NODE_ENV || 'dev'
 
+// Object to define the base configuration
 const baseConfig = {
     ENV,
     isDevelopment: ENV === 'dev' || ENV === 'development',
@@ -16,6 +17,7 @@ const baseConfig = {
     }
 }
 
+// Object to define the enviroment config
 let envConfig = {}
 
 switch(ENV) {
@@ -32,6 +34,6 @@ switch(ENV) {
     default:
         envConfig = optionsDev
 }
-console.log(merge(baseConfig, envConfig))
 
+// Exports the merge config
 module.exports = merge(baseConfig, envConfig)
